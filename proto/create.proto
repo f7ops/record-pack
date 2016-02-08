@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message CreateRecord {
+  string timestamp = 1;
+  string entity_id = 2;
+}
