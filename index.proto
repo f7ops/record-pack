@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+message CreateRecord {
+  string timestamp = 1;
+  string entity_id = 2;
+}
+
+message UpdateRecord {
+  string timestamp = 1;
+  string entity_id = 2;
+  string key = 3;
+  bytes value = 4;
+}
+
+message DestroyRecord {
+  string timestamp = 1;
+  string entity_id = 2;
+}
