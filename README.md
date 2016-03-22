@@ -5,29 +5,68 @@ Record-pack
 Primitives for [record-set](https://github.com/f7ops/record-set). Transactions for conflict-free set operations.
 
 ```
-let builder = new Builder()
+var RecordPack = require('record-pack'),
+    builder = new RecordPack.Builder(),
+    decode = new RecordPack.decode();
+
 ```
 
 Create
 -------
 
+
 ```
-builder.buildCreateRecord()
-// => createRecord({timestamp: "stnhsnth#aoekcrg", "entity_id": "rcaeohk-aoeurcgk-aoeklrcg"  })
+cRecord = new builder.buildCreateRecord();
+// => {
+//   timestamp: "4BThp+a4c7dee",
+//   entity_id: "cf42f0ea-f026-11e5-bd3a-6c3be57bb446"
+//   type: 'create'
+// }
+
+base64 = cRecord.toBase64(cRecord);
+// => 'ChE0QlRrNyt0YXE0eDg2OWE0aRIkNjBiZjA2NjMtZWIwMi00MTI2LTk3YTYtOGJhNTIxNzA1NjViGAE='
+
+record = decode(base64);
+// => {
+//   timestamp: "4BThp+a4c7dee",
+//   entity_id: "cf42f0ea-f026-11e5-bd3a-6c3be57bb446"
+//   type: 'create'
+// }
+
+
 ```
 
 Notes:
 
-  - `timestamp` is of the lamport variety. This particular strain (from [swarm.js](http://swarmjs.github.io/articles/lamport/)) is alphanumerically sortable. No decoding of base64 timestamps is required for finding the total order.
-  - Entity is a randomly choosen uuid
+  - `timestamp` is of the lamport variety. This particular strain (from [swarm.js](http://swarmjs.github.io/articles/lamport/)) is alphanumerically sortable. No decoding of timestamp strings is required to find the total order.
+  - Entity id is a randomly choosen uuid
 
 
 Update
 -------
 
 ```
-builder.buildUpdateRecord()
-// => updateRecord({timestamp: "!8V7N809+Walt~ssn", "entity_id": "3dfc6f4a-ef5d-11e5-a940-6c3be57bb446", "key": "some-property", value: [0x00,0xFF,0xF8]  })
+uRecord = new builder.buildUpdateRecord("cf42f0ea-f026-11e5-bd3a-6c3be57bb446", "arr", [123, 'ABC']);
+// => {
+//   timestamp: '4BTsB+a4c7dee',
+//   entity_id: 'cf42f0ea-f026-11e5-bd3a-6c3be57bb446',
+//   type: 'update',
+//   key: 'arr',
+//   value: [123, 'ABC']
+// }
+
+base64 = uRecord.toBase64(uRecord);
+// => 'ChE0QlR2Qyt0YXE0eDg2OWE0aRIZYW9lc3VudGgtYW9zZW50aC1hb2VzdXRuaBgCIgZ0aGluZ3MqDVsxMjUsInN0dWZmIl0='
+
+record = decode(base64);
+// => {
+//   timestamp: '4BTsB+a4c7dee',
+//   entity_id: 'cf42f0ea-f026-11e5-bd3a-6c3be57bb446',
+//   type: 'update',
+//   key: 'arr',
+//   value: [123, 'ABC']
+// }
+
 ```
 
 Notes:
@@ -40,8 +79,23 @@ Destroy
 ------
 
 ```
-builder.buildDestroyRecord()
-// => destroyRecord({timestamp: "!8V7N810+Walt~ssn", entity_id: "3dfc6f4a-ef5d-11e5-a940-6c3be57bb446"})
+dRecord = new builder.buildDestroyRecord("cf42f0ea-f026-11e5-bd3a-6c3be57bb446");
+// => {
+//   timestamp: '4BTtb+a4c7dee'
+//   entity_id: 'cf42f0ea-f026-11e5-bd3a-6c3be57bb446',
+//   type: 'destroy'
+// }
+
+base64 = dRecord.toBase64(dRecord);
+// => 'ChE0QlR2eCt0YXE0eDg2OWE0aRIZYW9lc3VudGgtYW9zZW50aC1hb2VzdXRuaBgD'
+
+record = decode(base64);
+// => {
+//   timestamp: '4BTtb+a4c7dee'
+//   entity_id: 'cf42f0ea-f026-11e5-bd3a-6c3be57bb446',
+//   type: 'destroy'
+// }
+
 ```
 
 License
