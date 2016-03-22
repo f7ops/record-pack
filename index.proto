@@ -6,7 +6,7 @@ message SetOperation {
 
   required string timestamp = 1;
   required string entity_id = 2;
-  required Type type = 3;
+  required Type t = 3;
 
   optional string key = 4;
   optional string val = 5;

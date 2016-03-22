@@ -14,8 +14,10 @@ Builder.prototype.buildCreateRecord = function(){
   var op = new SetOperation({
     timestamp: this.clock.issueTimestamp(),
     entity_id: uuid(),
-    type: 1 // 'CREATE' in Type enum of index.proto
+    t: 1 // 'CREATE' in Type enum of index.proto
   });
+
+  addTypeGetter(op);
 
   return op;
 };
@@ -24,12 +26,13 @@ Builder.prototype.buildUpdateRecord = function(entity_id, key, value){
   var op = new SetOperation({
     timestamp: this.clock.issueTimestamp(),
     entity_id: entity_id,
-    type: 2,
+    t: 2,
     key: key,
     val: JSON.stringify(value)
   });
 
-  Object.defineProperty(op, "value", { get: function(){ return JSON.parse(this.val); }});
+  addValueGetter(op);
+  addTypeGetter(op);
 
   return op;
 };
@@ -38,18 +41,40 @@ Builder.prototype.buildDestroyRecord = function(entity_id){
   var op = new SetOperation({
     timestamp: this.clock.issueTimestamp(),
     entity_id: entity_id,
-    type: 3
+    t: 3
   });
+
+  addTypeGetter(op);
 
   return op;
 };
 
 function decodeOperation(base64str){
   var op = SetOperation.decode64(base64str);
-  if (op.type == 2) {
-    Object.defineProperty(op, "value", { get: function(){ return JSON.parse(this.val); }});
+
+  addTypeGetter(op);
+
+  if (op.t == 2) {
+    addValueGetter(op);
   }
   return op;
+}
+
+function addValueGetter(obj){
+  Object.defineProperty(obj, "value", { get: function(){ return JSON.parse(this.val); }});
+}
+
+function addTypeGetter(obj){
+  Object.defineProperty(obj, "type", { get: function(){
+    switch(this.t) {
+      case 1:
+        return 'create';
+      case 2:
+        return 'update';
+      case 3:
+        return 'destroy';
+    }
+  }});
 }
 
 module.exports = {"Builder": Builder, decodeOperation: decodeOperation};

@@ -11,8 +11,8 @@ test('can #create', function(t){
   var c1 = builder.buildCreateRecord(),
       c2 = builder.buildCreateRecord();
 
-  t.equal(c1.type, 1);
-  t.equal(c2.type, 1);
+  t.equal(c1.type, 'create');
+  t.equal(c2.type, 'create');
 
   t.notEqual(c1.entity_id,
              c2.entity_id);
@@ -39,8 +39,8 @@ test('can #update', function(t){
   t.equal(u1.key, key);
   t.equal(u2.key, key);
 
-  t.equal(u1.type, 2);
-  t.equal(u2.type, 2);
+  t.equal(u1.type, 'update');
+  t.equal(u2.type, 'update');
 
   t.ok(c1.timestamp < u1.timestamp);
   t.ok(u1.timestamp < u2.timestamp);
@@ -55,8 +55,8 @@ test('can #destroy', function(t){
       c1 = builder.buildCreateRecord(),
       d1 = builder.buildDestroyRecord(c1.entity_id);
 
-  t.equal(c1.type, 1);
-  t.equal(d1.type, 3);
+  t.equal(c1.type, 'create');
+  t.equal(d1.type, 'destroy');
 
   t.ok(c1.timestamp < d1.timestamp);
 
@@ -74,7 +74,7 @@ test('can decode #create', function(t){
   var decoded = decode(record.toBase64());
 
   t.equal(decoded.entity_id, entity_id);
-  t.equal(decoded.type, 1);
+  t.equal(decoded.type, 'create');
   t.equal(decoded.timestamp, ts);
 
 });
@@ -92,7 +92,7 @@ test('can decode #update', function(t){
 
   t.equal(decoded.timestamp, ts);
   t.equal(decoded.entity_id, c1.entity_id);
-  t.equal(decoded.type, 2);
+  t.equal(decoded.type, 'update');
   t.equal(decoded.key, key);
   t.equal(decoded.value, value);
 
@@ -109,7 +109,7 @@ test('can decode #destroy', function(t){
   var decoded = decode(record.toBase64());
 
   t.equal(decoded.entity_id, entity_id);
-  t.equal(decoded.type, 3);
+  t.equal(decoded.type, 'destroy');
   t.equal(decoded.timestamp, ts);
 
 });
