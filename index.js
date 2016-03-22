@@ -2,13 +2,8 @@
 var uuid = require('node-uuid').v4,
     Clock = require('swarm-stamp').SecondPreciseClock,
     ProtoBuf = require('protobufjs'),
-    textEncoding = require('text-encoding'),
-    TextEncoder = textEncoding.TextEncoder,
-    TextDecoder = textEncoding.TextDecoder,
     pbBuilder = ProtoBuf.loadProtoFile('index.proto'),
-    CreateRecord  = pbBuilder.build("CreateRecord"),
-    UpdateRecord  = pbBuilder.build("UpdateRecord"),
-    DestroyRecord = pbBuilder.build("DestroyRecord");
+    SetOperation = pbBuilder.build("SetOperation");
 
 function Builder(){
   this.id = Math.random().toString(36).substring(7);
@@ -16,48 +11,48 @@ function Builder(){
 }
 
 Builder.prototype.buildCreateRecord = function(){
-  var cr = new CreateRecord({
+  var op = new SetOperation({
     timestamp: this.clock.issueTimestamp(),
-    entity_id: uuid()
+    entity_id: uuid(),
+    type: 1 // 'CREATE' in Type enum of index.proto
   });
 
-  return cr;
+  return op;
 };
 
 Builder.prototype.buildUpdateRecord = function(entity_id, key, value){
-  var ur = new UpdateRecord({
+  var op = new SetOperation({
     timestamp: this.clock.issueTimestamp(),
     entity_id: entity_id,
+    type: 2,
     key: key,
-    value: encode(value)
+    val: JSON.stringify(value)
   });
 
-  Object.defineProperty(ur, "value", { get: function(){ return value; }});
+  Object.defineProperty(op, "value", { get: function(){ return JSON.parse(this.val); }});
 
-  return ur;
+  return op;
 };
 
 Builder.prototype.buildDestroyRecord = function(entity_id){
-  var dr = new DestroyRecord({
+  var op = new SetOperation({
     timestamp: this.clock.issueTimestamp(),
-    entity_id: entity_id
+    entity_id: entity_id,
+    type: 3
   });
 
-  return dr;
+  return op;
 };
 
-function encode(value){
-  var encoder = new TextEncoder('utf-8');
-  return encoder.encode(JSON.stringify(value));
+function decodeOperation(base64str){
+  var op = SetOperation.decode64(base64str);
+  if (op.type == 2) {
+    Object.defineProperty(op, "value", { get: function(){ return JSON.parse(this.val); }});
+  }
+  return op;
 }
 
-function decode(byteArr){
-  var decoder = new TextDecoder('utf-8');
-  return JSON.parse(decoder.decode(byteArr));
-}
-
-
-module.exports = {"Builder": Builder};
+module.exports = {"Builder": Builder, decodeOperation: decodeOperation};
 
 
 

@@ -1,18 +1,13 @@
 syntax = "proto3";
 
-message CreateRecord {
-  string timestamp = 1;
-  string entity_id = 2;
-}
 
-message UpdateRecord {
-  string timestamp = 1;
-  string entity_id = 2;
-  string key = 3;
-  bytes value = 4;
-}
+message SetOperation {
+  enum Type { CREATE = 1; UPDATE = 2; DESTROY = 3; }
 
-message DestroyRecord {
-  string timestamp = 1;
-  string entity_id = 2;
+  required string timestamp = 1;
+  required string entity_id = 2;
+  required Type type = 3;
+
+  optional string key = 4;
+  optional string val = 5;
 }

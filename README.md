@@ -2,7 +2,7 @@
 Record-pack
 ================
 
-Primitives for [record-set](https://github.com/f7ops/record-set). Provide a structure on which conflict-free operations can be performed on a set.
+Primitives for [record-set](https://github.com/f7ops/record-set). Transactions for conflict-free set operations.
 
 ```
 let builder = new Builder()
