@@ -2,7 +2,18 @@
 var uuid = require('node-uuid').v4,
     Clock = require('swarm-stamp').SecondPreciseClock,
     ProtoBuf = require('protobufjs'),
-    pbBuilder = ProtoBuf.loadProtoFile('index.proto'),
+    pbBuilder = ProtoBuf.loadProto(
+      "syntax = \"proto3\";                                \n" +
+      "message SetOperation {                              \n" +
+      "  enum Type { CREATE = 1; UPDATE = 2; DESTROY = 3; }\n" +
+      "                                                    \n" +
+      "  required string timestamp = 1;                    \n" +
+      "  required string entity_id = 2;                    \n" +
+      "  required Type t = 3;                              \n" +
+      "                                                    \n" +
+      "  optional string key = 4;                          \n" +
+      "  optional string val = 5;                          \n" +
+      "}", 'index.proto'),
     SetOperation = pbBuilder.build("SetOperation");
 
 function Builder(){
