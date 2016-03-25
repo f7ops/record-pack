@@ -7,7 +7,8 @@ Primitives for [record-set](https://github.com/f7ops/record-set). Transactions f
 ```
 var RecordPack = require('record-pack'),
     builder = new RecordPack.Builder(),
-    decode = new RecordPack.decode();
+    encode = RecordPack.toString,
+    decode = RecordPack.fromString;
 
 ```
 
@@ -16,17 +17,18 @@ Create
 
 
 ```
-cRecord = new builder.buildCreateRecord();
+cRecord = builder.buildCreateRecord();
 // => {
 //   timestamp: "4BThp+a4c7dee",
 //   entity_id: "cf42f0ea-f026-11e5-bd3a-6c3be57bb446"
 //   type: 'create'
 // }
 
-base64 = cRecord.toBase64(cRecord);
+
+string = encode(cRecord)
 // => 'ChE0QlRrNyt0YXE0eDg2OWE0aRIkNjBiZjA2NjMtZWIwMi00MTI2LTk3YTYtOGJhNTIxNzA1NjViGAE='
 
-record = decode(base64);
+record = decode(string);
 // => {
 //   timestamp: "4BThp+a4c7dee",
 //   entity_id: "cf42f0ea-f026-11e5-bd3a-6c3be57bb446"
@@ -46,7 +48,7 @@ Update
 -------
 
 ```
-uRecord = new builder.buildUpdateRecord("cf42f0ea-f026-11e5-bd3a-6c3be57bb446", "arr", [123, 'ABC']);
+uRecord = builder.buildUpdateRecord("cf42f0ea-f026-11e5-bd3a-6c3be57bb446", "arr", [123, 'ABC']);
 // => {
 //   timestamp: '4BTsB+a4c7dee',
 //   entity_id: 'cf42f0ea-f026-11e5-bd3a-6c3be57bb446',
@@ -55,10 +57,10 @@ uRecord = new builder.buildUpdateRecord("cf42f0ea-f026-11e5-bd3a-6c3be57bb446", 
 //   value: [123, 'ABC']
 // }
 
-base64 = uRecord.toBase64(uRecord);
+string = encode(uRecord);
 // => 'ChE0QlR2Qyt0YXE0eDg2OWE0aRIZYW9lc3VudGgtYW9zZW50aC1hb2VzdXRuaBgCIgZ0aGluZ3MqDVsxMjUsInN0dWZmIl0='
 
-record = decode(base64);
+record = decode(string);
 // => {
 //   timestamp: '4BTsB+a4c7dee',
 //   entity_id: 'cf42f0ea-f026-11e5-bd3a-6c3be57bb446',
@@ -79,17 +81,17 @@ Destroy
 ------
 
 ```
-dRecord = new builder.buildDestroyRecord("cf42f0ea-f026-11e5-bd3a-6c3be57bb446");
+dRecord = builder.buildDestroyRecord("cf42f0ea-f026-11e5-bd3a-6c3be57bb446");
 // => {
 //   timestamp: '4BTtb+a4c7dee'
 //   entity_id: 'cf42f0ea-f026-11e5-bd3a-6c3be57bb446',
 //   type: 'destroy'
 // }
 
-base64 = dRecord.toBase64(dRecord);
+string = encode(dRecord);
 // => 'ChE0QlR2eCt0YXE0eDg2OWE0aRIZYW9lc3VudGgtYW9zZW50aC1hb2VzdXRuaBgD'
 
-record = decode(base64);
+record = decode(string);
 // => {
 //   timestamp: '4BTtb+a4c7dee'
 //   entity_id: 'cf42f0ea-f026-11e5-bd3a-6c3be57bb446',

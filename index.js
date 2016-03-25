@@ -26,7 +26,7 @@ Builder.prototype.buildUpdateRecord = function(entity_id, key, value){
   var op = new SetOperation({
     timestamp: this.clock.issueTimestamp(),
     entity_id: entity_id,
-    t: 2,
+    t: 2, // 'UPDATE' in Type enum of index.proto
     key: key,
     val: JSON.stringify(value)
   });
@@ -41,7 +41,7 @@ Builder.prototype.buildDestroyRecord = function(entity_id){
   var op = new SetOperation({
     timestamp: this.clock.issueTimestamp(),
     entity_id: entity_id,
-    t: 3
+    t: 3 // 'DESTROY' in Type enum of index.proto
   });
 
   addTypeGetter(op);
@@ -49,15 +49,30 @@ Builder.prototype.buildDestroyRecord = function(entity_id){
   return op;
 };
 
-function decodeOperation(base64str){
-  var op = SetOperation.decode64(base64str);
+function fromString(base64str){
 
-  addTypeGetter(op);
+  var strArray = base64str
+                   .split("\n")
+                   .filter(function(el){ return (el.length > 0); });
 
-  if (op.t == 2) {
-    addValueGetter(op);
+  return strArray.map(function(el){
+    var op = SetOperation.decode64(el);
+
+    addTypeGetter(op);
+    if (op.t == 2) { addValueGetter(op); }
+
+    return op;
+  });
+}
+
+function toString(op){
+  if (Array.isArray(op)){
+    return op
+      .map(function(op){ return op.toBase64(); })
+      .join("\n");
+  } else {
+    return op.toBase64();
   }
-  return op;
 }
 
 function addValueGetter(obj){
@@ -77,7 +92,7 @@ function addTypeGetter(obj){
   }});
 }
 
-module.exports = {"Builder": Builder, decodeOperation: decodeOperation};
+module.exports = {"Builder": Builder, toString: toString, fromString: fromString};
 
 
 
