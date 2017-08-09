@@ -7,8 +7,8 @@ var test = require('tape'),
 
 test('can #create', function(t){
 
-  var c1 = builder.buildCreateRecord(),
-      c2 = builder.buildCreateRecord();
+  var c1 = builder.create(),
+      c2 = builder.create();
 
   t.equal(c1.type, 'create');
   t.equal(c2.type, 'create');
@@ -25,9 +25,9 @@ test('can #create', function(t){
 test('can #update', function(t){
 
   var key = "name",
-      c1 = builder.buildCreateRecord(),
-      u1 = builder.buildUpdateRecord(c1.entity_id, key, valA = 1257),
-      u2 = builder.buildUpdateRecord(c1.entity_id, key, valB = ['things', 573]);
+      c1 = builder.create(),
+      u1 = builder.update(c1.entity_id, key, valA = 1257),
+      u2 = builder.update(c1.entity_id, key, valB = ['things', 573]);
 
   t.equal(u1.entity_id, c1.entity_id);
   t.equal(u2.entity_id, c1.entity_id);
@@ -51,8 +51,8 @@ test('can #update', function(t){
 test('can #destroy', function(t){
 
   var key = "name",
-      c1 = builder.buildCreateRecord(),
-      d1 = builder.buildDestroyRecord(c1.entity_id);
+      c1 = builder.create(),
+      d1 = builder.destroy(c1.entity_id);
 
   t.equal(c1.type, 'create');
   t.equal(d1.type, 'destroy');
@@ -67,7 +67,7 @@ test('can #destroy', function(t){
 
 test('can decode #create', function(t){
 
-  var record = builder.buildCreateRecord(),
+  var record = builder.create(),
       entity_id = record.entity_id,
       ts = record.timestamp;
 
@@ -85,8 +85,8 @@ test('can decode #create', function(t){
 
 test('can decode #update', function(t){
 
-  var c1 = builder.buildCreateRecord(),
-      record = builder.buildUpdateRecord(c1.entity_id, key = "things", value = 1250.00), // val must be number to assert correct persistance
+  var c1 = builder.create(),
+      record = builder.update(c1.entity_id, key = "things", value = 1250.00), // val must be number to assert correct persistance
       entity_id = record.entity_id,
       ts = record.timestamp;
 
@@ -106,7 +106,7 @@ test('can decode #update', function(t){
 
 test('can decode #destroy', function(t){
 
-  var record = builder.buildDestroyRecord(),
+  var record = builder.destroy(),
       entity_id = record.entity_id,
       ts = record.timestamp;
 
@@ -123,9 +123,9 @@ test('can decode #destroy', function(t){
 });
 
 test('can decode several records', function(t){
-  var c1 = builder.buildCreateRecord(),
-      u1 = builder.buildUpdateRecord(c1.id, key = "things", value = 4537),
-      d1 = builder.buildDestroyRecord(c1.id);
+  var c1 = builder.create(),
+      u1 = builder.update(c1.id, key = "things", value = 4537),
+      d1 = builder.destroy(c1.id);
 
   var decoded = decode(encode([c1, u1, d1]));
 
@@ -148,9 +148,9 @@ test('can decode several records', function(t){
 });
 
 test('can encode several records', function(t){
-  var c1 = builder.buildCreateRecord(),
-      u1 = builder.buildUpdateRecord(c1.id, key = "things", value = 4537),
-      d1 = builder.buildDestroyRecord(c1.id);
+  var c1 = builder.create(),
+      u1 = builder.update(c1.id, key = "things", value = 4537),
+      d1 = builder.destroy(c1.id);
 
   var str = encode([c1, u1, d1]);
 
@@ -160,9 +160,9 @@ test('can encode several records', function(t){
 });
 
 test('string encoded records are newline separated and independent', function(t){
-  var c1 = builder.buildCreateRecord(),
-      u1 = builder.buildUpdateRecord(c1.id, key = "things", value = 4537),
-      d1 = builder.buildDestroyRecord(c1.id);
+  var c1 = builder.create(),
+      u1 = builder.update(c1.id, key = "things", value = 4537),
+      d1 = builder.destroy(c1.id);
 
   var firstTwoLines = encode([c1, u1, d1]).split("\n").slice(0, 2).join("\n"),
       lastLine      = encode([c1, u1, d1]).split("\n").slice(2   ).join("\n");
