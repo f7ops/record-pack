@@ -10,31 +10,38 @@ var RecordPack = require('record-pack'),
     encode = RecordPack.toString,
     decode = RecordPack.fromString;
 
-```
-
-Create
--------
-
-
-```
-cRecord = builder.buildCreateRecord();
-// => {
-//   timestamp: "4BThp+a4c7dee",
-//   entity_id: "cf42f0ea-f026-11e5-bd3a-6c3be57bb446"
-//   type: 'create'
-// }
+c1 = builder.create();
+  => {
+       timestamp: "4BThp+a4c7dee",
+       entity_id: "cf42f0ea-f026-11e5-bd3a-6c3be57bb446"
+       type: 'create'
+     }
 
 
-string = encode(cRecord)
-// => 'ChE0QlRrNyt0YXE0eDg2OWE0aRIkNjBiZjA2NjMtZWIwMi00MTI2LTk3YTYtOGJhNTIxNzA1NjViGAE='
+u1 = builder.update(id, "a", 1)
+  => {
+       timestamp: '4BTsC+a4c7dee',
+       entity_id: 'cf42f0ea-f026-11e5-bd3a-6c3be57bb446',
+       type: 'update',
+       key: 'a',
+       value: 1
+     }
 
-record = decode(string);
-// => {
-//   timestamp: "4BThp+a4c7dee",
-//   entity_id: "cf42f0ea-f026-11e5-bd3a-6c3be57bb446"
-//   type: 'create'
-// }
+d1 = builder.destroy(id);
+  => {
+       timestamp: '4BTtb+a4c7dee'
+       entity_id: 'cf42f0ea-f026-11e5-bd3a-6c3be57bb446',
+       type: 'destroy'
+     }
 
+encode(c1)
+  => a674376cd7[...]5fd=
+
+encode([u1, u2])
+  => "a4c6754bfc736==\n4765cfffe74d836=="
+
+encode(d1)
+  => "4765cfffe74d836=="
 
 ```
 
@@ -42,63 +49,8 @@ Notes:
 
   - `timestamp` is of the lamport variety. This particular strain (from [swarm.js](http://swarmjs.github.io/articles/lamport/)) is alphanumerically sortable. No decoding of timestamp strings is required to find the total order.
   - Entity id is a randomly choosen uuid
-
-
-Update
--------
-
-```
-uRecord = builder.buildUpdateRecord("cf42f0ea-f026-11e5-bd3a-6c3be57bb446", "arr", [123, 'ABC']);
-// => {
-//   timestamp: '4BTsB+a4c7dee',
-//   entity_id: 'cf42f0ea-f026-11e5-bd3a-6c3be57bb446',
-//   type: 'update',
-//   key: 'arr',
-//   value: [123, 'ABC']
-// }
-
-string = encode(uRecord);
-// => 'ChE0QlR2Qyt0YXE0eDg2OWE0aRIZYW9lc3VudGgtYW9zZW50aC1hb2VzdXRuaBgCIgZ0aGluZ3MqDVsxMjUsInN0dWZmIl0='
-
-record = decode(string);
-// => {
-//   timestamp: '4BTsB+a4c7dee',
-//   entity_id: 'cf42f0ea-f026-11e5-bd3a-6c3be57bb446',
-//   type: 'update',
-//   key: 'arr',
-//   value: [123, 'ABC']
-// }
-
-```
-
-Notes:
-
   - Value is the lowest common denominator of all data types, a byte array. Higher-level libraries are responsible for enforcing more specific datatypes
 
-
-
-Destroy
-------
-
-```
-dRecord = builder.buildDestroyRecord("cf42f0ea-f026-11e5-bd3a-6c3be57bb446");
-// => {
-//   timestamp: '4BTtb+a4c7dee'
-//   entity_id: 'cf42f0ea-f026-11e5-bd3a-6c3be57bb446',
-//   type: 'destroy'
-// }
-
-string = encode(dRecord);
-// => 'ChE0QlR2eCt0YXE0eDg2OWE0aRIZYW9lc3VudGgtYW9zZW50aC1hb2VzdXRuaBgD'
-
-record = decode(string);
-// => {
-//   timestamp: '4BTtb+a4c7dee'
-//   entity_id: 'cf42f0ea-f026-11e5-bd3a-6c3be57bb446',
-//   type: 'destroy'
-// }
-
-```
 
 License
 -------

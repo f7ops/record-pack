@@ -14,14 +14,16 @@ var uuid = require('node-uuid').v4,
       "  optional string key = 4;                          \n" +
       "  optional string val = 5;                          \n" +
       "}", 'index.proto'),
-    SetOperation = pbBuilder.build("SetOperation");
+    SetOperation = pbBuilder.build("SetOperation"),
+    _ = require('lodash');
+
 
 function Builder(){
   this.id = Math.random().toString(36).substring(7);
   this.clock = new Clock(this.id);
 }
 
-Builder.prototype.buildCreateRecord = function(){
+Builder.prototype.create = function(){
   var op = new SetOperation({
     timestamp: this.clock.issueTimestamp(),
     entity_id: uuid(),
@@ -33,7 +35,7 @@ Builder.prototype.buildCreateRecord = function(){
   return op;
 };
 
-Builder.prototype.buildUpdateRecord = function(entity_id, key, value){
+Builder.prototype.update = function(entity_id, key, value){
   var op = new SetOperation({
     timestamp: this.clock.issueTimestamp(),
     entity_id: entity_id,
@@ -48,7 +50,7 @@ Builder.prototype.buildUpdateRecord = function(entity_id, key, value){
   return op;
 };
 
-Builder.prototype.buildDestroyRecord = function(entity_id){
+Builder.prototype.destroy = function(entity_id){
   var op = new SetOperation({
     timestamp: this.clock.issueTimestamp(),
     entity_id: entity_id,
@@ -62,7 +64,8 @@ Builder.prototype.buildDestroyRecord = function(entity_id){
 
 function fromString(base64str){
 
-  var strArray = base64str
+  var str = _.isString(base64str) ? base64str : "";
+  var strArray = str
                    .split("\n")
                    .filter(function(el){ return (el.length > 0); });
 

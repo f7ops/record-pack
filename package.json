@@ -12,6 +12,7 @@
     "tape": "^4.5.1"
   },
   "dependencies": {
+    "lodash": "^4.17.4",
     "node-uuid": "^1.4.7",
     "protobufjs": "^5.0.1",
     "swarm-stamp": "^1.0.14"
